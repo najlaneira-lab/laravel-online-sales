@@ -1,58 +1,114 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel Penjualan Online
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi penjualan online dengan dua peran (Admin dan Pelanggan), dibuat untuk
+praktikum Pengembangan Aplikasi Web.
 
-## About Laravel
+- **Nama:** Aneira Najla Mutia
+- **NIM:** 109062500062
+- **Stack:** Laravel 13.x, PHP 8.3+, MySQL, Blade, Eloquent, Git
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Admin**
+- Login dan dashboard ringkasan
+- Kelola kategori dan produk (upload gambar)
+- Barang masuk dan histori stok (IN/OUT)
+- Kelola layanan ekspedisi
+- Lihat transaksi, validasi, pembatalan (stok dikembalikan), ubah status
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Pelanggan**
+- Registrasi dan login
+- Katalog dengan pencarian, filter, urutan, dan pagination
+- Detail produk
+- Keranjang belanja (session)
+- Checkout dengan pilihan ekspedisi
+- Riwayat dan detail pesanan
 
-## Learning Laravel
+## Aturan Bisnis
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Stok hanya berubah lewat barang masuk, checkout, dan pembatalan.
+- Checkout memakai `DB::transaction()` dan `lockForUpdate()` untuk mencegah overselling.
+- Harga dan total selalu dihitung ulang oleh server.
+- Nama, harga produk, dan ongkir disalin ke order (snapshot).
+- Alur status: `pending` → `confirmed` → `processed` → `shipped` → `completed`.
+- Pembatalan hanya untuk `pending` dan `confirmed`.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Instalasi
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Prasyarat: PHP 8.3+, Composer, MySQL, Git.
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/USERNAME/laravel-online-sales.git
+cd laravel-online-sales
+composer install
+cp .env.example .env
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Buat database:
 
-## Contributing
+```sql
+CREATE DATABASE laravel_online_sales CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Atur koneksi di `.env`:
 
-## Code of Conduct
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=laravel_online_sales
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Jalankan migrasi, seeder, dan storage link:
 
-## Security Vulnerabilities
+```bash
+php artisan migrate
+php artisan db:seed
+php artisan storage:link
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Buka `http://127.0.0.1:8000`.
 
-## License
+## Akun Latihan
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Peran | Email | Password |
+|---|---|---|
+| Admin | admin@example.com | Admin12345! |
+| Pelanggan | daftar lewat halaman Register | - |
+
+Akun ini hanya untuk praktikum lokal. Jangan dipakai di production.
+
+## Pengujian Manual
+
+| No | Skenario | Hasil yang diharapkan |
+|---|---|---|
+| 1 | Customer registrasi | Akun tersimpan role=customer dan langsung login |
+| 2 | Customer membuka /admin | HTTP 403 |
+| 3 | Admin login | Masuk dashboard admin |
+| 4 | Admin tambah kategori dan produk | Produk tampil di admin dan katalog jika aktif |
+| 5 | Admin upload gambar | Gambar tersimpan di public storage dan tampil di katalog |
+| 6 | Admin stock-in 10 unit | Saldo stock +10, movement IN tercatat |
+| 7 | Pelanggan filter produk | Hasil sesuai keyword, kategori, harga, stok, sort |
+| 8 | Tambah cart melebihi stok | Validasi menolak |
+| 9 | Checkout 2 unit | Order pending, stock -2, movement OUT tercatat |
+| 10 | Admin confirm | Status confirmed, validator dan waktu tersimpan |
+| 11 | Admin cancel pending/confirmed | Status cancelled, stok kembali, movement IN tercatat |
+| 12 | Status order | Hanya urutan confirmed → processed → shipped → completed |
+
+## Milestone Git
+
+| Milestone | Fokus | Tag |
+|---|---|---|
+| M0 | Setup Laravel, database, repository | m0-setup |
+| M1 | Autentikasi dan role | m1-auth-role |
+| M2 | Kategori dan produk, upload gambar | m2-master-product |
+| M3 | Barang masuk, stok, ekspedisi | m3-inventory-shipping |
+| M4 | Katalog, detail, filter, pagination | m4-storefront |
+| M5 | Session cart | m5-cart |
+| M6 | Checkout, order, stok OUT | m6-checkout |
+| M7 | Admin transaksi, validasi, cancel, status | m7-order-admin |
+| M8 | QA dan dokumentasi | m8-final |
