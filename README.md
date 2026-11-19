@@ -3,8 +3,8 @@
 Aplikasi penjualan online dengan dua peran (Admin dan Pelanggan), dibuat untuk
 praktikum Pengembangan Aplikasi Web.
 
-- **Nama:** Nama Kamu
-- **NIM:** 00000000
+- **Nama:** Aneira Najla Mutia
+- **NIM:** 109062500062
 - **Stack:** Laravel 13.x, PHP 8.3+, MySQL, Blade, Eloquent, Git
 
 ## Fitur
