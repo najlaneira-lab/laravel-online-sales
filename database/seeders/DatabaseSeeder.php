@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminUserSeeder::class,
-            // MasterDataSeeder::class, // diaktifkan di M3
+            MasterDataSeeder::class,
         ]);
     }
 }
